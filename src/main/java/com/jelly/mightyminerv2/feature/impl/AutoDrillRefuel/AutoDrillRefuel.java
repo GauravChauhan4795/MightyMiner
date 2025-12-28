@@ -28,7 +28,7 @@ public class AutoDrillRefuel extends AbstractFeature {
     public enum FuelType{
         VOLTA ("Volta"),
         OIL_BARREL ("Oil Barrel"),
-        SUNFLOWER_OIL ("Sunflower Oil");
+        SUNFLOWER_OIL ("Sunflower Oil"); //New addition and easier to get
 
         @Getter
         private final String name;
