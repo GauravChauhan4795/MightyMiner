@@ -46,7 +46,7 @@ public class MiningMacro extends AbstractMacro {
     private boolean handleRefuelIfNeeded() {
         if (!MightyMinerConfig.drillRefuel) return false;
     
-        String tool = InventoryUtil.getHeldItemName();
+        String tool = MightyMinerConfig.miningTool;
         if (tool == null) return false;
     
         if (!tool.contains("Drill")) return false;
