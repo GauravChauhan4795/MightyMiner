@@ -28,8 +28,8 @@ public class PathExecutor {
     private final Map<Long, List<Long>> map = new HashMap<>();
     private final List<BlockPos> blockPath = new ArrayList<>();
     private final Clock stuckTimer = new Clock();
-    private final DelayTimer nodeSwitchDelay = new DelayTimer();
-    private final DelayTimer jumpDelay = new DelayTimer();
+    private final Clock nodeSwitchDelay = new Clock();
+    private final Clock jumpDelay = new Clock();
     @Getter
     private boolean enabled = false;
     private Path prev;
