@@ -6,8 +6,10 @@ import com.jelly.mightyminerv2.feature.impl.AutoGetStats.AutoGetStats;
 import com.jelly.mightyminerv2.feature.impl.AutoGetStats.tasks.impl.MiningSpeedRetrievalTask;
 import com.jelly.mightyminerv2.feature.impl.AutoGetStats.tasks.impl.PickaxeAbilityRetrievalTask;
 import com.jelly.mightyminerv2.feature.impl.BlockMiner.BlockMiner;
+import com.jelly.mightyminerv2.feature.impl.AutoDrillRefuel.AutoDrillRefuel;
 import com.jelly.mightyminerv2.macro.AbstractMacro;
 import com.jelly.mightyminerv2.util.helper.MineableBlock;
+import com.jelly.mightyminerv2.util.InventoryUtil;
 import lombok.Getter;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -39,6 +41,29 @@ public class MiningMacro extends AbstractMacro {
     @Override
     public String getName() {
         return "Mining Macro";
+    }
+
+    private boolean handleRefuelIfNeeded() {
+        if (!MightyMinerConfig.drillRefuel) return false;
+    
+        String tool = InventoryUtil.getHeldItemName();
+        if (tool == null) return false;
+    
+        if (!tool.contains("Drill")) return false;
+    
+        int fuel = InventoryUtil.getDrillRemainingFuel(tool);
+    
+        if (fuel <= 100 && !AutoDrillRefuel.getInstance().isRunning()) {
+            log("Low drill fuel detected (" + fuel + "). Starting auto refuel.");
+    
+            miner.stop();          // stop mining safely
+            isMining = false;      // allow restart after refuel
+    
+            AutoDrillRefuel.getInstance().start();
+            return true;
+        }
+    
+        return AutoDrillRefuel.getInstance().isRunning();
     }
 
     @Override
@@ -93,6 +118,10 @@ public class MiningMacro extends AbstractMacro {
     public void onTick(TickEvent.ClientTickEvent event) {
         if (miningSpeed == 0) {
             handleGettingStats();
+            return;
+        }
+
+        if (handleRefuelIfNeeded()) {
             return;
         }
 
