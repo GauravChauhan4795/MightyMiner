@@ -209,10 +209,14 @@ public class PathExecutor {
             BlockPos nextTarget = this.blockPath.get(this.target + 1);
             double playerDistToNext = playerPos.distanceSq(nextTarget);
             double targetDistToNext = target.distanceSq(nextTarget);
+            double tolerance = 0.3 + random.nextDouble() * 0.25;
 
-            if ((this.pastTarget || (this.pastTarget = playerDistToNext > targetDistToNext)) && playerDistToNext < targetDistToNext) {
-                this.previous = this.target;
-                this.target++;
+            if ((this.pastTarget || (this.pastTarget = playerDistToNext > targetDistToNext - tolerance)) && playerDistToNext < targetDistToNext) {
+                if (pastTarget && nodeSwitchDelay.passed()) {
+                    this.previous = this.target;
+                    this.target++;
+                    nodeSwitchDelay.schedule(50 + random.nextInt(70));
+                }
                 target = this.blockPath.get(this.target);
                 log("walked past target");
             }
@@ -238,6 +242,8 @@ public class PathExecutor {
                 BlockPos rotationTarget = this.blockPath.get(i);
                 if (Math.hypot(mc.thePlayer.posX - rotationTarget.getX(), mc.thePlayer.posZ - rotationTarget.getZ()) > 5) {
                     rotYaw = AngleUtil.getRotation(rotationTarget).yaw;
+                    float humanError = (float) (random.nextGaussian() * 1.2);
+                    rotYaw += humanError;
                     break;
                 }
             }
@@ -268,17 +274,22 @@ public class PathExecutor {
             }
         }
 
-        StrafeUtil.enabled = yawDiff > 3;
+        StrafeUtil.enabled = yawDiff > 1;
+        StrafeUtil.strength = Math.min(1f, yawDiff / 30f);
         StrafeUtil.yaw = ipYaw;
 
         Vec3 pos = new Vec3(mc.thePlayer.posX, playerPos.getY() + 0.5, mc.thePlayer.posZ);
         Vec3 vec4Rot = AngleUtil.getVectorForRotation(yaw);
         boolean shouldJump = BlockUtil.canWalkBetween(this.curr.getCtx(), pos, pos.addVector(vec4Rot.xCoord, 1, vec4Rot.zCoord));
-        KeyBindUtil.setKeyBindState(mc.gameSettings.keyBindForward, true);
+        if (random.nextDouble() > 0.02) {
+            KeyBindUtil.setKeyBindState(mc.gameSettings.keyBindForward, true);
+        } else {
+            KeyBindUtil.setKeyBindState(mc.gameSettings.keyBindForward, false);
+        }
         KeyBindUtil.setKeyBindState(mc.gameSettings.keyBindSprint, this.allowSprint && yawDiff < 40 && !shouldJump);
-        if (shouldJump && onGround) {
+        if (shouldJump && onGround && jumpDelay.passed()) {
             mc.thePlayer.jump();
-            this.state = State.JUMPING;
+            jumpDelay.schedule(80 + random.nextInt(120));
         }
         KeyBindUtil.setKeyBindState(mc.gameSettings.keyBindJump, shouldJump);
 
