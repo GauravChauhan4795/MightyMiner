@@ -7,7 +7,8 @@ import com.jelly.mightyminerv2.macro.impl.CommissionMacro.CommissionMacro;
 public class RefuelState implements CommissionMacroState{
 
     private final AutoDrillRefuel.FuelType[] fuelTypeMap =
-            {AutoDrillRefuel.FuelType.VOLTA, AutoDrillRefuel.FuelType.OIL_BARREL};
+            {AutoDrillRefuel.FuelType.VOLTA, AutoDrillRefuel.FuelType.OIL_BARREL,
+             AutoDrillRefuel.FuelType.SUNFLOWER_OIL};
 
     @Override
     public void onStart(CommissionMacro macro) {
