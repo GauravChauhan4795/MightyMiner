@@ -161,7 +161,7 @@ public class MightyMinerConfig extends Config {
             name = "Machine Fuel",
             category = GENERAL,
             subcategory = "Auto Refuel",
-            options = {"Volta", "Oil Barrel"}
+            options = {"Volta", "Oil Barrel", "Sunflower Oil"}
     )
     public static int refuelMachineFuel = 1;
 
